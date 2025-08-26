@@ -1,0 +1,59 @@
+select * from Customers
+
+--uso de wildcards 
+select * from Customers
+where ContactName like 'A%'
+
+select * from Customers
+where CustomerID LIKE '__0__'
+
+select * from Customers
+WHERE CustomerID like '[a-e]%' 
+
+---ejercicios bien pe 
+/* 
+1. mostrar todos los "customers" que tengan una direccion de "Av"
+2. mostrar todos los "customers" que no pertenezcan al pais "Brazil"
+3. mostrar todos los "customers" que no tengan una region "NULL" y que el fax no sea "NUll"
+*/
+SELECT * FROM Customers 
+where  Address like 'Av.%'
+
+select * from Customers 
+where Country <> 'Brazil'
+
+select *from Customers 
+where Country
+
+--uso de in 
+select * from Employees
+where TitleOfCourtesy in ('Ms.', 'Mr.')
+
+--mostrar a los "employes" que sean de la ciudad "seattle, tacoma ; redmond" 
+select * from Employees
+where City in ( 'seattle', 'tacoma' , 'redmond')
+
+--uso de gruop by 
+select City, count (*) from Customers 
+group by City 
+order by count(*) desc 
+
+select count (*) FROM Customers,---contar los registros 
+select sum(UnitPrice) FROM Products----sumar los precios unitarios de los productos.
+select avg(UnitPrice) from Products------promedio de precios unitarios 
+/* 
+4. contar todos las "orders" agrupando por el "shipCountry"
+5. contar todas las orders agrupando por el "shipcity"
+6. sumar todos los  unitprice de los products agrupando por categoryid 
+*/
+
+select ShipCountry, count(*) 'cantidad pe ' from Orders
+group by ShipCountry
+
+select ShipCity, count(*) 'cantidad pe ' from Orders
+group by ShipCity
+
+
+
+select sum(UnitPrice) from Products
+group by CategoryID
