@@ -1,0 +1,62 @@
+group by categoriesID
+ 1=
+ select 'PIAD-302' from Categories
+ union 
+ select 'PIAD-303' from categories
+
+ select 'PIAD-302', 'PIAD 305' from categories 
+ union all 
+ select 'PIAD 303', 'PIAD-304' from categories
+ --unir todas las filas,id y nombre de las tablas productos y categorias
+ select CategoryId, CategoryName from Categories
+ union all 
+ select ProductId, ProductName from Products
+
+
+ --consulta--uo de INNER JOIN 
+ select p.ProductID, p.ProductName, p.UnitPrice, c.CategoryName from Products p
+ inner join Categories c on p.CategoryID = c.CategoryID
+
+
+ --mostrar el productoID,productname,unitprice,categoryname
+ select p.ProductID, p.ProductName, p.UnitPrice, c.CategoryName
+ from Products p 
+ inner join Categories c on p.CategoryID = c.CustomerID;
+
+ --ORDERS Y CUSTOMERS --> INNER (3 COLUMNAS DE CADA TABLA)
+ select o.OrderID, o.OrderDate, o.ShipCity, c.CustomerID, c.CompanyName, c.ContactName
+ from orders o 
+ inner join Customers c on o.CustomerID = c.CustomerID
+
+ --ORDERS Y ORDERS DETAILS--> INNER (5 COLUMNAS DE CADA TABLA)
+ select o.OrderID, o.OrderDate, o.CustomerID, o.ShipCity, o.Freight, od.ProductID, od.UnitPrice, od.Quantity, od.Discount, od.OrderID
+ from Orders o 
+ inner join [Order Details] od on o.OrderID = od.OrderID
+
+ /*
+ 1.-mostrar el total de los "Orders" y agruparlos por Company Name 
+ nota: para calcular el total, lo obtienes de la tabla de order details (UnitPrice * Quantity)
+ Ejemplo:
+ Alfreds Futturkiste              -600 
+ Ana Trujillo Emparedados y helados  -956
+  2.- mostrar la cantidad de "orders" agrupados por el nombre del empleado 
+ ejemplo:
+ Nancy 20 
+ Janet 88
+ */
+SELECT
+    c.CompanyName,
+    SUM(od.UnitPrice * od.Quantity) AS TotalOrders
+FROM Customers c
+INNER JOIN Orders o
+    ON c.CustomerID = o.CustomerID
+INNER JOIN [Order Details] od
+    ON o.OrderID = od.OrderID
+GROUP BY c.CompanyName
+ORDER BY TotalOrders DESC;
+
+
+SELECT e.FirstName, COUNT(o.OrderID) AS CantidadOrders
+FROM Employees e
+INNER JOIN Orders o ON e.EmployeeID = o.EmployeeID
+GROUP BY e.FirstName;
