@@ -1,0 +1,76 @@
+SELECT * FROM users;
+
+DELETE FROM users WHERE id=2;
+
+CREATE TABLE UserLogs(
+     userLogId INT primary key identity(1,1),
+	 [action] varchar(100),
+	 [user] varchar(100),
+	 [date] datetime
+);
+
+CREATE TRIGGER triger_delete_users ON users 
+AFTER
+     DELETE
+AS
+  INSERT INTO Userlogs([action], [user], [date])
+                  Values('DELETE', SUSER_NAME(), SYSDATETIME())
+
+--CREAR UN TRIGGER PARA LA TABLA USERS CUANDO SE ACTUALICE UN REGISTRO 
+CREATE TRIGGER triger_delete_users ON users 
+AFTER
+     update
+AS
+  INSERT INTO Userlogs([action], [user], [date])
+                  Values('DELETE', SUSER_NAME(), SYSDATETIME())
+
+declare @numero1 int= 20
+declare @numero2 int=10
+
+declare @suma int= @numero1 + @numero2 
+
+print'el resultado es' print @suma
+
+SELECT * FROM Pedidos;
+
+-- Eliminar trigger si ya existe
+IF OBJECT_ID('trigger_update_Pedidos', 'TR') IS NOT NULL
+    DROP TRIGGER trigger_update_Pedidos;
+GO
+
+-- Crear trigger nuevo
+CREATE TRIGGER trigger_update_Pedidos
+ON Pedidos
+AFTER UPDATE
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    INSERT INTO UserLogs([action], [user], [date], [detalle])
+    SELECT
+        'UPDATE' AS [action],
+        SUSER_SNAME() AS [user],
+        SYSDATETIME() AS [date],
+        'ID Pedido: ' + CAST(i.IdPedido AS NVARCHAR(50)) +
+        ', Id Cliente anterior: ' + ISNULL(CAST(d.IdCliente AS NVARCHAR(50)), 'NULL') +
+        ', Id Cliente nuevo: ' + ISNULL(CAST(i.IdCliente AS NVARCHAR(50)), 'NULL') +
+        ', Fecha Pedido anterior: ' + ISNULL(CONVERT(NVARCHAR(30), d.FechaPedido, 120), 'NULL') +
+        ', Fecha Pedido nuevo: ' + ISNULL(CONVERT(NVARCHAR(30), i.FechaPedido, 120), 'NULL') +
+        ', Cargo anterior: ' + ISNULL(CAST(d.Cargo AS NVARCHAR(50)), 'NULL') +
+        ', Cargo nuevo: ' + ISNULL(CAST(i.Cargo AS NVARCHAR(50)), 'NULL') +
+        ', Destinatario anterior: ' + ISNULL(d.Destinatario, 'NULL') +
+        ', Destinatario nuevo: ' + ISNULL(i.Destinatario, 'NULL')
+    FROM inserted i
+    INNER JOIN deleted d ON i.IdPedido = d.IdPedido;
+END;
+GO
+
+UPDATE Pedidos
+SET Cargo = Cargo + 10, -- o cualquier cambio válido, por ejemplo sumarle 10 al cargo
+    Destinatario = 'Nuevo Destinatario'
+WHERE IdPedido = 2;
+GO
+SELECT TOP 10 *
+FROM Pedidos
+ORDER BY FechaEntrega DESC;
+GO
